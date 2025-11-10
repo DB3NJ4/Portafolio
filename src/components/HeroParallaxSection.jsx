@@ -9,22 +9,22 @@ export default function HeroParallaxSection({ products }) {
   const secondRow = products.slice(4, 8)
   const thirdRow = products.slice(8, 12)
   const heroRef = useRef(null)
-  const scrollRef = useRef(null)
 
   // Hero fade out
-  const { scrollY } = useScroll({ target: heroRef })
+  const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
   const heroY = useTransform(scrollY, [0, 300], [0, -50])
 
   // Parallax products
-  const { scrollYProgress } = useScroll({ target: scrollRef, offset: ["start start", "end start"] })
   const springConfig = { stiffness: 180, damping: 18, bounce: 0 }
-  const translateX = useSpring(useTransform(scrollYProgress, [0, 1], [0, 1000]), springConfig)
-  const translateXReverse = useSpring(useTransform(scrollYProgress, [0, 1], [0, -1000]), springConfig)
-  const rotateX = useSpring(useTransform(scrollYProgress, [0, 0.2], [15, 0]), springConfig)
-  const opacity = useSpring(useTransform(scrollYProgress, [0, 0.2], [0.25, 1]), springConfig)
-  const rotateZ = useSpring(useTransform(scrollYProgress, [0, 0.2], [20, 0]), springConfig)
-  const translateY = useSpring(useTransform(scrollYProgress, [0, 0.2], [-700, 0]), springConfig)
+
+  // Start parallax más pronto, apenas bajás un poco
+  const translateX = useSpring(useTransform(scrollY, [0, 800], [0, 1000]), springConfig)
+  const translateXReverse = useSpring(useTransform(scrollY, [0, 800], [0, -1000]), springConfig)
+  const rotateX = useSpring(useTransform(scrollY, [0, 300], [15, 0]), springConfig)
+  const rotateZ = useSpring(useTransform(scrollY, [0, 300], [20, 0]), springConfig)
+  const translateY = useSpring(useTransform(scrollY, [0, 300], [-700, 0]), springConfig)
+  const opacity = useSpring(useTransform(scrollY, [0, 300], [0.25, 1]), springConfig)
 
   const [isVisible, setIsVisible] = useState(false)
   useEffect(() => setIsVisible(true), [])
@@ -37,19 +37,6 @@ export default function HeroParallaxSection({ products }) {
         style={{ opacity: heroOpacity, y: heroY }}
         className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden"
       >
-        {/* Partículas */}
-        <div className="absolute inset-0 z-0">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-blue-400 rounded-full"
-              initial={{ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, opacity: 0 }}
-              animate={{ y: [null, -30, 0], opacity: [0, 0.5, 0] }}
-              transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, delay: Math.random() * 2 }}
-            />
-          ))}
-        </div>
-
         {/* Icono */}
         <motion.div className="flex justify-center mb-6" initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ duration: 0.8, type: "spring" }}>
           <div className="bg-blue-600/20 p-4 rounded-full relative">
@@ -63,37 +50,15 @@ export default function HeroParallaxSection({ products }) {
           Hola, soy <span className="text-blue-400 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Benjamín</span>
         </motion.h1>
 
-        {/* Subtítulo */}
+        {/* Subtítulo actualizado */}
         <motion.p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
           <Terminal className="inline w-6 h-6 mr-2 text-blue-400" />
           Desarrollador Full Stack apasionado por crear experiencias digitales excepcionales
         </motion.p>
-
-        {/* Botones */}
-        <motion.div className="flex justify-center space-x-4 mb-12" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}>
-          <motion.a href="#projects" className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center space-x-2 relative overflow-hidden group" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <span className="relative z-10">Ver Proyectos</span>
-            <FaArrowDown className="w-4 h-4 relative z-10" />
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </motion.a>
-          <motion.a href="#contact" className="border-2 border-blue-400 text-blue-400 px-8 py-3 rounded-lg font-semibold hover:bg-blue-400 hover:text-white transition-all duration-300 relative overflow-hidden group" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <span className="relative z-10">Contactar</span>
-            <div className="absolute inset-0 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-          </motion.a>
-        </motion.div>
-
-        {/* Redes */}
-        <motion.div className="flex justify-center space-x-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.8 }}>
-          {[{ icon: <FaGithub className="w-6 h-6" />, href: "#" }, { icon: <FaLinkedin className="w-6 h-6" />, href: "#" }, { icon: <FaEnvelope className="w-6 h-6" />, href: "#" }].map((s, i) => (
-            <motion.a key={i} href={s.href} className="text-gray-400 hover:text-white p-3 rounded-full bg-gray-800/50 backdrop-blur-sm hover:bg-blue-600/20 border border-gray-700 hover:border-blue-400" whileHover={{ scale: 1.2, rotate: 5 }} whileTap={{ scale: 0.9 }}>
-              {s.icon}
-            </motion.a>
-          ))}
-        </motion.div>
       </motion.section>
 
       {/* SCROLL PARALLAX DE PRODUCTOS */}
-      <motion.div ref={scrollRef} style={{ rotateX, rotateZ, translateY, opacity }} className="container mx-auto mt-40">
+      <motion.div style={{ rotateX, rotateZ, translateY, opacity }} className="container mx-auto mt-40">
         {[firstRow, secondRow, thirdRow].map((row, idx) => (
           <motion.div key={idx} className={`flex ${idx % 2 === 0 ? "flex-row-reverse space-x-reverse" : "flex-row"} space-x-10 mb-20`}>
             {row.map(product => (

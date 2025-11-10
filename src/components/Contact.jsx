@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FaEnvelope, FaMapMarkerAlt, FaBriefcase, FaGithub, FaLinkedin, FaTwitter, FaPaperPlane, FaPhone } from 'react-icons/fa';
+import emailjs from 'emailjs-com';
+
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -19,21 +21,27 @@ const Contact = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulación de envío
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    console.log('Formulario enviado:', formData);
-    setSubmitStatus('success');
-    setIsSubmitting(false);
-    
-    setTimeout(() => {
-      setFormData({ name: '', email: '', message: '' });
-      setSubmitStatus(null);
-    }, 3000);
-  };
+  e.preventDefault();
+  setIsSubmitting(true);
+
+  try {
+    await emailjs.send(
+      "service_hfrjw4s",
+      "template_f4el2t3",
+      formData,
+      "-i7JLMny57fHDUlm3"
+    );
+
+    setSubmitStatus("success");
+    setFormData({ name:"", email:"", message:"" });
+  } catch (error) {
+    console.error("ERROR EMAILJS:", error);
+    setSubmitStatus("error");
+  }
+
+  setIsSubmitting(false);
+};
+
 
   const socialLinks = [
     { icon: <FaGithub className="w-5 h-5" />, href: "#", color: "hover:bg-gray-600" },
@@ -189,6 +197,9 @@ const Contact = () => {
             </motion.h3>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_template" value="box" />
+
               {['name', 'email'].map((field, index) => (
                 <motion.div
                   key={field}
@@ -271,6 +282,17 @@ const Contact = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+            {submitStatus === 'error' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.8 }}
+              className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-center"
+            >
+              ❌ hubo un error, inténtalo de nuevo
+            </motion.div>
+          )}
+
           </motion.div>
         </div>
       </div>
